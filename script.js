@@ -1,3 +1,5 @@
+var currentServer = "";
+
 class User {
     constructor(name, email, permissions, profilePicture) {
         this.name = name
@@ -26,7 +28,7 @@ class User {
         this.servers.add(server)
         return true
     }
-    
+
     removeServer(server) {
         if (this.servers.has(server)) return false
         this.servers.delete(server)
@@ -36,7 +38,7 @@ class User {
     changePerms(perm) {
         this.permissions = perm
     }
-    
+
     changePicture(picture) {
         this.picture = picture
     }
@@ -52,7 +54,6 @@ class Server {
         for (let i = 0; i < channels.length; i++) {
             this.channels.add(channels[i])
         }
-
         this.users = new Set()
 
         this.createServerButton()
@@ -64,30 +65,42 @@ class Server {
         button.appendChild(temp);
         button.addEventListener("click", () => this.loadRooms());
         button.className = "serverButton";
-        document.getElementById("classes").appendChild(button);
+        button.id = this.name;
+        document.getElementById("classes").insertBefore(button, document.getElementById("editServerBtn"));
     }
 
-    loadRooms() {        
+    loadRooms() {
         let childChecker = document.getElementById("rooms");
+        currentServer = this.name;
 
-        while(childChecker.hasChildNodes())
-        {
+        while (childChecker.hasChildNodes()) {
             childChecker.removeChild(childChecker.children[0]);
         }
 
-        for(let channel of this.channels) {
+        // Edit button:
+        let button = document.createElement("button");
+        let temp = document.createTextNode("Edit");
+        button.appendChild(temp);
+        button.addEventListener("click", () => editChannels());
+        button.className = "roomButton";
+        button.id = "editChannelBtn";
+        document.getElementById("rooms").appendChild(button);
+
+        // The rest of the channels:
+        for (let channel of this.channels) {
             let button = document.createElement("button");
             let temp = document.createTextNode(channel.name);
             button.appendChild(temp);
             button.addEventListener("click", () => this.colorChange(channel));
             button.setAttribute("Id", channel.name)
             button.className = "roomButton";
+            button.id = channel.name;
             document.getElementById("rooms").appendChild(button);
         }
     }
 
     colorChange(channel) {
-        for(let temp of this.channels){
+        for (let temp of this.channels) {
             document.getElementById(temp.name).style.color = "LightSlateGrey";
         }
 
@@ -113,11 +126,13 @@ class Server {
     addChannel(channel) {
         if (this.channels.has(channel)) return false
         this.channels.add(channel)
+        this.loadRooms()
         return true
     }
     removeChannel(channel) {
         if (this.channels.has(channel)) return false
         this.channels.delete(channel)
+        this.loadRooms()
         return true
     }
     addUser(user) {
@@ -125,7 +140,7 @@ class Server {
         this.users.add(user)
         return true
     }
-    
+
     removeUser(user) {
         if (this.users.has(user)) return false
         this.users.delete(user)
@@ -134,9 +149,8 @@ class Server {
 }
 
 class Channel {
-    constructor(name, category, server) {
+    constructor(name, category) {
         this.chatLogs = [] // maybe make this into set?
-        this.server = server
         this.category = category
         this.name = name
     }
@@ -151,12 +165,12 @@ class Channel {
     }
 
     loadChatroom() {
-        document.getElementById("chatroomHeader").innerHTML = this.server + "'s "+ this.name+ " Chatroom";
+        document.getElementById("chatroomHeader").innerHTML = currentServer + "'s " + this.name + " Chatroom";
         document.getElementById(this.name).style.color = "rgb(6, 87, 238)";
     }
     // double check on how to link message with actual message in chatroom, right now its by text but could be by time/id
     message(message) {
-        for(let i = 0; i < this.chatLogs.length; i++) {
+        for (let i = 0; i < this.chatLogs.length; i++) {
             if (message == this.chatLogs[i].text) return this.chatLogs[i]
         }
     }
@@ -166,7 +180,7 @@ class Channel {
 
     removeChat(message) {
         let found = false;
-        for(let i = 0; i < this.chatLogs.length; i++) {
+        for (let i = 0; i < this.chatLogs.length; i++) {
             if (message == this.chatLogs[i].text) {
                 this.chatLogs.splice(i, 1)
                 found = true;
@@ -207,38 +221,21 @@ class ChatMessage {
 
 }
 
-
 function goHome() {
-    document.getElementById("serverOptions").setAttribute("display", "none");
+
 }
 
-let spanChannel = [
-    new Channel("Homework Help", "help", "Spanish"),
-    new Channel("Group Chat", "Students", "Spanish"),
-    new Channel("Exam Prep", "Exam", "Spanish")
-]
-
-let chemChannel = [
-    new Channel("Homework Help", "help", "Chemistry"),
-    new Channel("Group Chat", "Students", "Chemistry"),
-    new Channel("Exam Prep", "Exam", "Chemistry")
-]
-let englChannel = [
-    new Channel("Homework Help", "help", "Writing"),
-    new Channel("Group Chat", "Students", "Writing"),
-    new Channel("Exam Prep", "Exam", "Writing")
-]
-let mathChannel = [
-    new Channel("Homework Help", "help", "Calculus"),
-    new Channel("Group Chat", "Students", "Calculus"),
-    new Channel("Exam Prep", "Exam", "Calculus")
+let tempChannel = [
+    new Channel("Homework Help", "help"),
+    new Channel("Group chat", "Students"),
+    new Channel("Exam Prep", "Exam")
 ]
 
 let servers = [
-    new Server("Calculus", "Math", mathChannel),
-    new Server("Writing", "English", englChannel),
-    new Server("Chemistry", "Science", chemChannel),
-    new Server("Spanish", "Language", spanChannel)
+    new Server("Calculus", "Math", tempChannel),
+    new Server("Writing", "English", tempChannel),
+    new Server("Chemistry", "Science", tempChannel),
+    new Server("Spanish", "Language", tempChannel)
 ]
 
 function sendMessage() {
@@ -265,4 +262,49 @@ function sendMessage() {
 
     chatborder.insertBefore(newMessage, textLine);
     chatbox.value = "";
+}
+
+function createEditButton() {
+    let button = document.createElement("button");
+    let temp = document.createTextNode("Edit");
+    button.appendChild(temp);
+    button.addEventListener("click", () => editServers());
+    button.className = "serverButton";
+    button.id = "editServerBtn";
+    document.getElementById("classes").appendChild(button);
+}
+
+createEditButton();
+
+function editServers() {
+    let action = prompt("Enter add or delete: ");
+
+    if (action == "add") {
+        let serverName = prompt("Enter server name to add: ");
+        let departmentName = prompt("Enter department name: ");
+
+        let newServer = new Server(serverName, departmentName, tempChannel);
+    }
+
+    else if (action == "delete") {
+        serverName = prompt("Enter server name to delete: ");
+        document.getElementById("classes").removeChild(document.getElementById(serverName));
+    }
+}
+
+function editChannels() {
+    let action = prompt("Enter add or delete: ");
+
+    if (action == "add") {
+        let channelName = prompt("Enter channel name to add: ");
+        let channelCategory = prompt("Enter channel category: ");
+
+        let newChannel = new Channel(channelName, channelCategory);
+        servers[0].addChannel(newChannel); // get server by id, then call addChannel
+    }
+
+    else if (action == "delete") {
+        channelName = prompt("Enter channel name to delete: ");
+        document.getElementById("rooms").removeChild(document.getElementById(channelName));
+    }
 }
