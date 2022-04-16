@@ -65,7 +65,7 @@ class sideBar
 }
 
 //Represents a calendar for the user
-class calendar
+class calendarInterface
 {
     //Constructor for calendar class
     constructor()
@@ -92,6 +92,23 @@ class calendar
 
         //Create a new FullCalendar, no new parameters for now
         this.fullCalendar = new FullCalendar.Calendar(this.calendar , {
+            headerToolbar: {
+                center: 'addEventButton,deleteEventButton'
+            },
+            customButtons: {
+                addEventButton:
+                {
+                    text: 'Add Event',
+                    click: function()
+                    {
+                        createEventPrompt();
+                    }
+                },
+                deleteEventButton:
+                {
+                    text: 'Delete Event'
+                }
+            }
         });
     
         //Render fullCalendar
@@ -332,13 +349,6 @@ class todoList
 
 }
 
-//Create a new sideBar
-let side = new sideBar();
-//Create a new calendar
-let cal = new calendar();
-//Create todoList
-let to = new todoList();
-
 //Contains all information about the user homePage
 class homePage
 {
@@ -350,7 +360,7 @@ class homePage
         this.side = new sideBar();
 
         //The Calendar
-        this.cal = new calendar();
+        this.cal = new calendarInterface();
 
         //The TodoList
         this.to = new todoList();
@@ -699,10 +709,16 @@ function onSignIn(googleUser){
       }
 
 var span = document.getElementsByClassName("close")[0];
+var spanEvent = document.getElementsByClassName("close")[1];
 
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {
     document.getElementById("myModal").style.display = "none";
+}
+
+// When the user clicks on <span> (x), close the modal
+spanEvent.onclick = function() {
+    document.getElementById("createEvent").style.display = "none";
 }
 
 //Goes to the homepage
@@ -796,3 +812,32 @@ Element.prototype.insertChildAtIndex = function(child, index) {
       this.insertBefore(child, this.children[index])
     }
   }
+
+  //An object that get the events of a calendar
+  class calendar
+  {
+      
+      constructor()
+      {
+        //A list of all events of a calendar
+        this.events = [];
+      }
+  }
+
+  //A function that creates the prompt for creating a new event
+  function createEventPrompt()
+  {
+    //Firstly, get the createEvent modal
+    let createEvent = window.document.querySelector("#createEvent");
+
+    //Turn off the display of the button
+    createEvent.style.display = "";
+  }
+
+  //A function that creates a new event for calendar
+  function addEvent()
+  {
+      //Firstly, get creatEvent
+      let createEvent = document.getElementById("createEvent");  
+  }
+
