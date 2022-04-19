@@ -1,4 +1,5 @@
 //Add links to the javascript in full calendar
+const socket = io();
 
 //Creates a class that will represent the sideBar
 class sideBar {
@@ -84,7 +85,7 @@ class calendar {
         //Next, attach cal to the body
         // window.document.querySelector("body").appendChild(this.calendar);
 
-        //Create a new FullCalendar, no new parameters for now
+        //Create a new xr, no new parameters for now
         this.fullCalendar = new FullCalendar.Calendar(this.calendar, {
         });
 
@@ -438,8 +439,6 @@ home.render();
 window.document.querySelector("body").appendChild(home.homePage);
 
 
-var currentServer = ""; // comment out??
-
 
 class User {
     constructor(name, email, permissions, profilePicture) {
@@ -449,6 +448,7 @@ class User {
         this.status = 3
         this.permissions = permissions
         this.profilePicture = profilePicture
+        this.room = ""
     }
 
     // Getters
@@ -463,6 +463,10 @@ class User {
     }
     perms() {
         return this.permissions
+    }
+
+    currentRoom() {
+        return this.room;
     }
 
     addServer(server) { // adds a server for the user
@@ -483,6 +487,10 @@ class User {
 
     changePicture(picture) { // changes the user's profile picture
         this.picture = picture
+    }
+
+    setCurrentRoom(room) {
+        this.room = room
     }
 }
 
@@ -507,6 +515,26 @@ class Server {
         button.addEventListener("click", () => {
             this.loadRooms()
             leaveHome();
+            let messages = document.getElementById('chatborder');
+            if (currentUser.room != "") {
+                socket.emit('leaveRoom', {})
+            }
+
+            while (chatborder.childNodes.length > 2) {
+                chatborder.removeChild(chatborder.lastChild)
+            }
+
+
+
+            currentUser.setCurrentRoom(this.name)
+
+            socket.emit('joinRoom', currentUser)
+            // add userlist functionality?
+            socket.on('roomUsers', (currentUser) => {
+                // outputRoomName(currentUser.room)
+                // outputUsers(currentUser.users)
+            })
+
         });
         button.className = "serverButton";
         button.id = this.name + "server";
@@ -686,7 +714,11 @@ class ChatMessage {
 
 }
 
-let currentUser = new User("GenericUsername", "example@gmail.com", "", "");
+let currentUser = new User("Guest", "example@gmail.com", "", "");
+
+function setUser() {
+
+}
 
 function onSignIn(googleUser) { // uses the Google API sign in
     var profile = googleUser.getBasicProfile();
@@ -698,12 +730,15 @@ function onSignIn(googleUser) { // uses the Google API sign in
     var id_token = googleUser.getAuthResponse().id_token;
     console.log("ID Token: " + id_token);
     document.getElementById("myModal").style.display = "none";
+    currentUser = new User(profile.getName(), profile.getEmail(), "", profile.getImageUrl())
+
 }
 function renderButton() {
     gapi.signin2.render('my-signin2', {
         'theme': 'dark'
     });
 }
+
 
 var span = document.getElementsByClassName("close")[0];
 
@@ -712,9 +747,6 @@ span.onclick = function () {
     document.getElementById("myModal").style.display = "none";
 }
 
-window.addEventListener("keypress", function (event) { //calls send message when user presses the enter button
-    if (event.key === 'Enter') sendMessage();
-})
 
 function goHome() {
 
@@ -768,12 +800,38 @@ let servers = [
     new Server("Spanish", "Language", spanChannel)
 ]
 
-function sendMessage() {
+let sendButton = document.getElementById('send')
+let chatBorder = document.getElementById('chatborder')
+let sendBox = document.getElementById('chatbox')
+
+sendBox.addEventListener("keypress", function (event) { //calls send message when user presses the enter button
+    if (event.key === 'Enter') {
+        const msg = sendBox.value
+
+        socket.emit('chatMessage', msg)
+    };
+})
+
+sendButton.addEventListener('click', (e) => {
+    let chatbox = document.getElementById("chatbox")
+    const msg = chatbox.value
+    console.log(msg)
+
+    socket.emit('chatMessage', msg)
+    chatbox.focus()
+})
+
+socket.on('message', message => {
+    console.log(message)
+    sendMessage(message)
+    chatBorder.scrollTop = chatBorder.scrollHeight;
+})
+
+function sendMessage(message) {
+
     let chatborder = document.getElementById("chatborder"); // parent, containing all the messages
     let chatbox = document.getElementById("chatbox"); // input box
     let textLine = document.getElementById("textLine"); // child of chatborder, parent to chatbox
-
-    if (chatbox.value == "") return; // if the chatbox is empty, do nothing
 
     var currentdate = new Date(); // obtains the current time
     var datetime = currentdate.getDate() + "/" // contains the date and time information
@@ -788,11 +846,14 @@ function sendMessage() {
     let userInfo = document.createElement("div"); // the time and user information of the message
     let messageText = document.createElement("div"); // the actual text of the message
 
-    userInfo.textContent = `[${datetime}] ${currentUser.name}:`;
-    messageText.textContent = chatbox.value;
+    newMessage.setAttribute('class', 'chat-message')
+    userInfo.textContent = `[${message.time}] ${message.username}:`;
+    messageText.textContent = message.text;
 
     newMessage.appendChild(userInfo); // first append the new message with the information
     newMessage.appendChild(messageText); // and then the text itself
+
+    console.log(message.time, message.username, message.text)
 
     // Appropriately inserts the new message to chatborder
     if (chatborder.childElementCount == 1) {
@@ -800,7 +861,7 @@ function sendMessage() {
     }
     else { chatborder.insertChildAtIndex(newMessage, 1) }
     chatbox.value = "";
-    console.log(chatborder.childElementCount)
+    //console.log(chatborder.childElementCount)
 }
 
 Element.prototype.insertChildAtIndex = function (child, index) {
@@ -829,7 +890,6 @@ function editServers() {
 
     if (action == "add") {
         let serverName = prompt("Enter server name to add: ");
-        // let departmentName = prompt("Enter department name: ");
 
         let tempChannel = [
             new Channel("Homework Help", "help", serverName),
@@ -848,18 +908,23 @@ function editServers() {
 function editChannels() {
     let action = prompt("Enter add or delete: ");
 
+    let index = 0;
+    for (let i = 0; i < servers.length; i++) {
+        if (servers[i].name == currentUser.currentRoom())
+            index = i;
+    }
+
     if (action == "add") {
         let channelName = prompt("Enter channel name to add: ");
-        // let channelCategory = prompt("Enter channel category: ");
 
-        let newChannel = new Channel(channelName, "", servers[0].name);
-        servers[0].addChannel(newChannel);
+        let newChannel = new Channel(channelName, "", currentUser.currentRoom());
+        servers[index].addChannel(newChannel);
     }
 
     else if (action == "delete") {
         channelName = prompt("Enter channel name to delete: ");
 
-        servers[0].removeChannel(channelName);
+        servers[index].removeChannel(channelName);
     }
 }
 
