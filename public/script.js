@@ -448,6 +448,8 @@ class User {
         this.status = 3
         this.permissions = permissions
         this.profilePicture = profilePicture
+        this.server = ""
+        this.channel = ""
         this.room = ""
     }
 
@@ -490,7 +492,15 @@ class User {
     }
 
     setCurrentRoom(room) {
-        this.room = room
+        this.room = this.server + this.channel
+    }
+
+    setCurrentChannel(channel) {
+        this.channel = channel
+    }
+
+    setCurrentServer(server) {
+        this.server = server
     }
 }
 
@@ -527,13 +537,8 @@ class Server {
 
 
             currentUser.setCurrentRoom(this.name)
+            currentUser.setCurrentServer(this.name)
 
-            socket.emit('joinRoom', currentUser)
-            // add userlist functionality?
-            socket.on('roomUsers', (currentUser) => {
-                // outputRoomName(currentUser.room)
-                // outputUsers(currentUser.users)
-            })
 
         });
         button.className = "serverButton";
@@ -563,7 +568,22 @@ class Server {
             let button = document.createElement("button");
             let temp = document.createTextNode(channel.name);
             button.appendChild(temp);
-            button.addEventListener("click", () => this.colorChange(channel));
+            button.addEventListener("click", () => {
+                this.colorChange(channel)
+                if (currentUser.room != "") {
+                    socket.emit('leaveRoom', {})
+                }
+                currentUser.setCurrentChannel(channel.name)
+                currentUser.setCurrentRoom(channel.name)
+                
+                console.log()
+                socket.emit('joinRoom', currentUser)
+                // add userlist functionality?
+                socket.on('roomUsers', (currentUser) => {
+                    // outputRoomName(currentUser.room)
+                    // outputUsers(currentUser.users)
+                })
+            });
             button.setAttribute("Id", channel.name)
             button.className = "roomButton";
             button.id = channel.name + "channel";
