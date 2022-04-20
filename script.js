@@ -839,5 +839,104 @@ Element.prototype.insertChildAtIndex = function(child, index) {
   {
       //Firstly, get creatEvent
       let createEvent = document.getElementById("createEvent");  
+
+      //Next, get all the inputs for title, startDate, endDate, and color
+      let title = window.document.getElementById("createTitle").value
+      let startDate = window.document.getElementById("createStartDate").value
+      let endDate = window.document.getElementById("createEndDate").value
+      let color = window.document.getElementById("createColor").value
+
+    //Next, check if the values in title, startDate, endDate, and color are valid
+    console.log(checkTitle(title));
+    console.log(checkStartDate(startDate));
   }
 
+  //Checks if title is valid
+  function checkTitle(title)
+  {
+      //Firstly, check if title is not empty
+      //If title is empty
+      if(title.length == 0)
+      {
+          //Alert the user that the input is empty
+          alert("Title is empty");
+
+          //Return false
+          return false;
+      }
+
+      //Otherwise, return true
+      return true; 
+  }
+
+  //Checks if startDate is valid
+  function checkStartDate(startDate)
+  {
+      //Firstly, check if startDate is not empty
+      //If startDate is empty
+      if(startDate.length == 0)
+      {
+          //Alert the user that the input is empty
+          alert("Start Date is Empty");
+
+          //Return false
+          return false;
+      }
+      
+      //Otherwise, if the length of startDate is not 7
+      else if(startDate.length != 10)
+      {
+          //Alert the user that the input is invalid
+          alert("Start Date is invalid");
+
+          //Return false
+          return false;
+      }
+
+      checkDate(startDate);
+  }
+
+  //Checks if a date is valid
+  function checkDate(date)
+  {
+    //Firstly, check if - exists in date
+    let firstDash = date.charAt(4);
+    let secondDash = date.charAt(7);
+
+    //If the firstDash and secondDash are not equal to -
+    if(firstDash != '-' || secondDash != '-')
+    {
+        //Alert the user that the input does not include -
+        alert("Invalid Date");
+
+        //Return false
+        return false;
+    }
+
+    //Next, checks if there exists any dots at index 6 and 9
+    let firstDot = date.charAt(6);
+    let secondDot = date.charAt(9);
+
+    //If the firstDont and secondDots are dots
+    if(firstDot == '.' || secondDot == '.')
+    {
+        //Alert the user that the input is invalid
+        alert("Invaild Date");
+
+        //Return false
+        return false;
+    }
+
+    //Next, get the year, month, and day from date
+    let year = Number(date.substring(0, 4));
+    let month = Number(date.substring(5,7));
+    let day = Number(date.substring(8,10));
+
+    //Next, check if year, month and day are valids integers
+    //If year, mont, and day are not integers
+    if(Number.isInteger(year) && Number.isInteger(month) && Number.isInteger(day))
+    {
+        //
+    }
+    
+}
