@@ -42,6 +42,28 @@
                     </div>
                 </div>
             </div>
+
+            <div id="createEvent" class="modal" style="display: none;">
+                <div class="modal-content" style="width:20%;">
+                    <span class="close">&times;</span>
+                    <div style="text-align: center; padding-bottom: 10px;">Add Event</div>
+    
+                    <label for="title">Title:</label>
+                    <input type="text" id="createTitle" ></input>
+                    <br></br>
+                    <label for="startDate" >Start Date:</label>
+                    <input type="text" placeholder="YYYY-MM-DD" id="createStartDate"></input>
+                    <br></br>
+                    <label for="endDate" >End Date:</label>
+                    <input type="text" placeholder="YYYY-MM-DD" id="createEndDate"></input>
+                    <br></br>
+                    <label for="Color">Color:</label>
+                    <input type="text" id="createColor" ></input>
+                    <br></br>
+                    <button onclick="addEvent()">Add Event</button>
+                </div>
+            </div>
+            
         </div> 
     </body>
 </html> 

@@ -63,7 +63,8 @@ class sideBar {
 }
 
 //Represents a calendar for the user
-class calendar {
+class calendarInterface
+{
     //Constructor for calendar class
     constructor() {
         //Contains the html content of claendar
@@ -85,8 +86,25 @@ class calendar {
         //Next, attach cal to the body
         // window.document.querySelector("body").appendChild(this.calendar);
 
-        //Create a new xr, no new parameters for now
-        this.fullCalendar = new FullCalendar.Calendar(this.calendar, {
+        //Create a new FullCalendar, no new parameters for now
+        this.fullCalendar = new FullCalendar.Calendar(this.calendar , {
+            headerToolbar: {
+                center: 'addEventButton,deleteEventButton'
+            },
+            customButtons: {
+                addEventButton:
+                {
+                    text: 'Add Event',
+                    click: function()
+                    {
+                        createEventPrompt();
+                    }
+                },
+                deleteEventButton:
+                {
+                    text: 'Delete Event'
+                }
+            }
         });
 
         //Render fullCalendar
@@ -315,13 +333,6 @@ class todoList {
 
 }
 
-//Create a new sideBar
-let side = new sideBar();
-//Create a new calendar
-let cal = new calendar();
-//Create todoList
-let to = new todoList();
-
 //Contains all information about the user homePage
 class homePage {
     //Constructor for home page
@@ -331,7 +342,7 @@ class homePage {
         this.side = new sideBar();
 
         //The Calendar
-        this.cal = new calendar();
+        this.cal = new calendarInterface();
 
         //The TodoList
         this.to = new todoList();
@@ -741,13 +752,19 @@ function renderButton() {
 
 
 var span = document.getElementsByClassName("close")[0];
+var spanEvent = document.getElementsByClassName("close")[1];
 
 // When the user clicks on <span> (x), close the modal
 span.onclick = function () {
     document.getElementById("myModal").style.display = "none";
 }
 
+// When the user clicks on <span> (x), close the modal
+spanEvent.onclick = function() {
+    document.getElementById("createEvent").style.display = "none";
+}
 
+//Goes to the homepage
 function goHome() {
 
     //Hide the rooms bar, chatroom header, and chatroom from the display
@@ -952,4 +969,132 @@ function testSuite() {
 
     console.log("Test #1: adding a server " + addServer());
     console.log("Test #2: deleting a server " + deleteServer());
+}
+
+  //An object that get the events of a calendar
+  class calendar
+  {
+      
+      constructor()
+      {
+        //A list of all events of a calendar
+        this.events = [];
+      }
+  }
+
+  //A function that creates the prompt for creating a new event
+  function createEventPrompt()
+  {
+    //Firstly, get the createEvent modal
+    let createEvent = window.document.querySelector("#createEvent");
+
+    //Turn off the display of the button
+    createEvent.style.display = "";
+  }
+
+  //A function that creates a new event for calendar
+  function addEvent()
+  {
+      //Firstly, get creatEvent
+      let createEvent = document.getElementById("createEvent");  
+
+      //Next, get all the inputs for title, startDate, endDate, and color
+      let title = window.document.getElementById("createTitle").value
+      let startDate = window.document.getElementById("createStartDate").value
+      let endDate = window.document.getElementById("createEndDate").value
+      let color = window.document.getElementById("createColor").value
+
+    //Next, check if the values in title, startDate, endDate, and color are valid
+    console.log(checkTitle(title));
+    console.log(checkStartDate(startDate));
+  }
+
+  //Checks if title is valid
+  function checkTitle(title)
+  {
+      //Firstly, check if title is not empty
+      //If title is empty
+      if(title.length == 0)
+      {
+          //Alert the user that the input is empty
+          alert("Title is empty");
+
+          //Return false
+          return false;
+      }
+
+      //Otherwise, return true
+      return true; 
+  }
+
+  //Checks if startDate is valid
+  function checkStartDate(startDate)
+  {
+      //Firstly, check if startDate is not empty
+      //If startDate is empty
+      if(startDate.length == 0)
+      {
+          //Alert the user that the input is empty
+          alert("Start Date is Empty");
+
+          //Return false
+          return false;
+      }
+      
+      //Otherwise, if the length of startDate is not 7
+      else if(startDate.length != 10)
+      {
+          //Alert the user that the input is invalid
+          alert("Start Date is invalid");
+
+          //Return false
+          return false;
+      }
+
+      checkDate(startDate);
+  }
+
+  //Checks if a date is valid
+  function checkDate(date)
+  {
+    //Firstly, check if - exists in date
+    let firstDash = date.charAt(4);
+    let secondDash = date.charAt(7);
+
+    //If the firstDash and secondDash are not equal to -
+    if(firstDash != '-' || secondDash != '-')
+    {
+        //Alert the user that the input does not include -
+        alert("Invalid Date");
+
+        //Return false
+        return false;
+    }
+
+    //Next, checks if there exists any dots at index 6 and 9
+    let firstDot = date.charAt(6);
+    let secondDot = date.charAt(9);
+
+    //If the firstDont and secondDots are dots
+    if(firstDot == '.' || secondDot == '.')
+    {
+        //Alert the user that the input is invalid
+        alert("Invaild Date");
+
+        //Return false
+        return false;
+    }
+
+    //Next, get the year, month, and day from date
+    let year = Number(date.substring(0, 4));
+    let month = Number(date.substring(5,7));
+    let day = Number(date.substring(8,10));
+
+    //Next, check if year, month and day are valids integers
+    //If year, mont, and day are not integers
+    if(Number.isInteger(year) && Number.isInteger(month) && Number.isInteger(day))
+    {
+        //
+    }
+    
 }
