@@ -114,6 +114,13 @@ class calendarInterface
         window.dispatchEvent(new Event('resize'));
     }
 
+    //Loads the full calendar
+    loadCalendar(events)
+    {
+        //Set fullcalendar's event source to be events
+        this.fullCalendar.addEventSource(events);
+    }
+
 }
 
 //To-Do List Class
@@ -974,13 +981,49 @@ function testSuite() {
   //An object that get the events of a calendar
   class calendar
   {
-      
+      //Constructs constructor
       constructor()
       {
         //A list of all events of a calendar
         this.events = [];
       }
+
+      //Adds a new event to events
+      addNewEvent(newEvent)
+      {
+          //Add newEvent to events
+          this.events.push(newEvent);
+
+          console.log(this.events);
+
+          //Add the current events to localstorage
+          this.storeEvents();
+      }
+
+      //Store events
+      storeEvents()
+      {
+          //Store the events in local storage
+          window.localStorage.setItem("calendarEvents", JSON.stringify(this.events));
+      }
+
+      //Load events
+      loadEvents()
+      {
+          //Load the events from local storage
+          this.events = JSON.parse(window.localStorage.getItem("calendarEvents"));
+
+          //If the event is null, set it to be []
+          if(this.events == null)
+          {
+              this.events = [];
+          }
+      }
   }
+
+  let cal = new calendar();
+  cal.loadEvents();
+  home.cal.loadCalendar(cal.events);
 
   //A function that creates the prompt for creating a new event
   function createEventPrompt()
@@ -1004,9 +1047,66 @@ function testSuite() {
       let endDate = window.document.getElementById("createEndDate").value
       let color = window.document.getElementById("createColor").value
 
-    //Next, check if the values in title, startDate, endDate, and color are valid
-    console.log(checkTitle(title));
-    console.log(checkStartDate(startDate));
+      //Next, check all the inputs
+      //If all the inputs are valid
+      if(checkAllEventInput(title, startDate, endDate, color))
+      {
+        
+        //Modifty endDate so that endDate will be displayed correctly
+        let end = new Date(endDate)
+        end.setDate(end.getDate() + 1);
+        
+          //Next, create a new event
+          let newEvent = {
+              title : title,
+              start : startDate,
+              end : end, 
+              color : color
+          }
+
+          //Add the event to the calendarInterface
+          home.cal.fullCalendar.addEvent(newEvent);
+
+          //Also add the event to the calenda object
+          cal.addNewEvent(newEvent);
+      }
+
+  }
+
+  //Check all values from the input
+  function checkAllEventInput(title, startDate, endDate, color)
+  {
+      //Firstly, check title
+      //If title is not valid
+      if(checkTitle(title) == false)
+      {
+          //Return false
+          return false;
+      }
+      //Otherwise, if startDate is not valid
+      else if(checkStartDate(startDate)  == false)
+      {
+          //Return false
+          return false;
+      }
+      //Otherwise, if endDate is not valid
+      else if(checkEndDate(startDate, endDate) == false)
+      {
+          //Return false
+          return false;
+      }
+      //Otherwise, if color is not valid
+      else if(checkColor(color) == false)
+      {
+          //Return false
+          return false;
+      }
+      //Otherwise, all the inputs are valid
+      else
+      {
+        //Return true
+        return true;
+      }
   }
 
   //Checks if title is valid
@@ -1041,7 +1141,7 @@ function testSuite() {
           return false;
       }
       
-      //Otherwise, if the length of startDate is not 7
+      //Otherwise, if the length of startDate is not 10
       else if(startDate.length != 10)
       {
           //Alert the user that the input is invalid
@@ -1050,8 +1150,65 @@ function testSuite() {
           //Return false
           return false;
       }
+      //Otherwise, if start date is not a valid
+      else if(checkDate(startDate) == false)
+      {
+          //Alert the user that the input is invalid
+          alert("Start Date is invalid");
 
-      checkDate(startDate);
+          //Return false
+          return false;
+      }
+
+      //Otherwise, start date is valid, return true
+      return true;
+  }
+
+
+  //Checks the endDate
+  function checkEndDate(startDate, endDate)
+  {
+      //If the length of endDate is 0, return true
+      if(endDate.length == 0)
+      {
+            //Return true
+            return true;
+      }
+      //Otherwise, if not
+      else
+      {
+        //Next, check the length of endDate
+        //If endDate's length is not 10
+        if(endDate.length != 10)
+        {
+            //Alert the user that endDate is not valid
+            alert("End Date is not valid");
+
+            //Return false
+            return false;
+        }
+        //Otherwise, if endDate is not a valid date
+        else if(checkDate(endDate) == false)
+        {
+            //Alert the user that endDate is not valid
+            alert("End Date is not valid");
+
+            //Return false
+            return false;
+        }
+        //Otherwise, if endDate comes before startDate
+        else if(consecutiveDates(startDate, endDate) == false)
+        {
+            //Return false
+            return false;
+        }
+        //Otherwise, endDate is valid
+        else
+        {
+            //Return true
+            return true;
+        }
+      }
   }
 
   //Checks if a date is valid
@@ -1064,23 +1221,18 @@ function testSuite() {
     //If the firstDash and secondDash are not equal to -
     if(firstDash != '-' || secondDash != '-')
     {
-        //Alert the user that the input does not include -
-        alert("Invalid Date");
-
-        //Return false
+         //Return false
         return false;
     }
 
-    //Next, checks if there exists any dots at index 6 and 9
+    //Next, checks if there exists any dots at index 3, 6, and 9
     let firstDot = date.charAt(6);
     let secondDot = date.charAt(9);
+    let thirdDot = date.charAt(3);
 
-    //If the firstDont and secondDots are dots
-    if(firstDot == '.' || secondDot == '.')
+    //If the firstDot, secondDot, or thridDot are .
+    if(firstDot == '.' || secondDot == '.' || thirdDot == '.')
     {
-        //Alert the user that the input is invalid
-        alert("Invaild Date");
-
         //Return false
         return false;
     }
@@ -1091,10 +1243,77 @@ function testSuite() {
     let day = Number(date.substring(8,10));
 
     //Next, check if year, month and day are valids integers
-    //If year, mont, and day are not integers
-    if(Number.isInteger(year) && Number.isInteger(month) && Number.isInteger(day))
+    //If year, month, and day are not integers
+    if(!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day))
     {
-        //
+        //Return false
+        return false;
+    }
+
+    ///Finallyy, create a new date
+    let newDate = new Date(date.toString());
+    
+    //Check if the newDate is valid
+    //If the date is not the correct value
+    if (isNaN(newDate.valueOf()))
+    {
+        //Return false
+        return false
     }
     
+    //Otherwise, date is valid, 
+    //Return true
+    return true;
+}
+
+function consecutiveDates(startDate, endDate)
+{
+    //Convert both startDate and endDate
+    let start = new Date(startDate.toString());
+    let end = new Date(endDate.toString());
+    
+    //Then check if the endDate comes after the startDate
+    //To do so, subtract start from end
+    //If end - start is greater than 0, then endDate comes after startDate
+    if(end - start >= 0)
+    {
+        //Return true
+        return true;
+    }
+    //Otherwise, if end- start is less than 0, then start came before end
+    else
+    {
+        //Tell the user that end Date is coming before start date
+        alert("End Date comes before Start Date");
+
+        //Return false
+        return false;
+    }
+}
+
+//Checks if a color is valid
+function checkColor(color)
+{
+    //Firstly, create a new element that will not be used
+    let element = document.createElement("p");
+
+    //Secondly, set the color of the element to be color
+    element.style.color = color;
+
+    //Next, check the element's color
+    //If the element's color exists then the color passed in is valid
+    if(element.style.color != '')
+    {
+        //Return true
+        return true;
+    }
+    //Otherwise, the color does not exist
+    else
+    {
+        //Tell the user that color is not valid
+        alert("The color does not exist");
+
+        //Return false
+        return false;
+    }
 }
