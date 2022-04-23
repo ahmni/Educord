@@ -527,6 +527,7 @@ class Server {
             leaveHome();
             let messages = document.getElementById('chatborder');
             if (currentUser.room != "") {
+                console.log(currentUser.room)
                 socket.emit('leaveRoom', {})
             }
 
@@ -534,9 +535,9 @@ class Server {
                 chatborder.removeChild(chatborder.lastChild)
             }
 
+            document.getElementById('chatroomHeader').innerHTML = this.name;
 
-
-            currentUser.setCurrentRoom(this.name)
+            
             currentUser.setCurrentServer(this.name)
 
 
@@ -572,6 +573,9 @@ class Server {
                 this.colorChange(channel)
                 if (currentUser.room != "") {
                     socket.emit('leaveRoom', {})
+                }
+                while (chatborder.childNodes.length > 2) {
+                    chatborder.removeChild(chatborder.lastChild)
                 }
                 currentUser.setCurrentChannel(channel.name)
                 currentUser.setCurrentRoom(channel.name)
@@ -826,19 +830,29 @@ let sendBox = document.getElementById('chatbox')
 
 sendBox.addEventListener("keypress", function (event) { //calls send message when user presses the enter button
     if (event.key === 'Enter') {
-        const msg = sendBox.value
-
-        socket.emit('chatMessage', msg)
+        if (currentUser.channel != "") {
+            const msg = sendBox.value;
+            socket.emit('chatMessage', msg)
+            chatbox.value = "";
+        } else {
+            alert("Error: please join a room")
+        }
     };
 })
 
 sendButton.addEventListener('click', (e) => {
     let chatbox = document.getElementById("chatbox")
-    const msg = chatbox.value
-    console.log(msg)
+    if (currentUser.channel != "") {
+        const msg = chatbox.value
+   
 
-    socket.emit('chatMessage', msg)
-    chatbox.focus()
+        socket.emit('chatMessage', msg)
+        chatbox.focus()
+        chatbox.value = "";
+    }else {
+        alert("Error: please join a room")
+    }
+   
 })
 
 socket.on('message', message => {
@@ -865,9 +879,20 @@ function sendMessage(message) {
     let newMessage = document.createElement("div"); // the message to add to chatborder
     let userInfo = document.createElement("div"); // the time and user information of the message
     let messageText = document.createElement("div"); // the actual text of the message
+    userInfo.id = "userinfo"
+    messageText.id ="message-text"
+    
 
+    let name = document.createElement("p")
+    let date = document.createElement("p")
+    name.id = "username"
     newMessage.setAttribute('class', 'chat-message')
-    userInfo.textContent = `[${message.time}] ${message.username}:`;
+    name.textContent = `   ${message.username}`;
+    date.textContent = `${message.time}`
+    userInfo.appendChild(name)
+    userInfo.appendChild(date)
+    
+
     messageText.textContent = message.text;
 
     newMessage.appendChild(userInfo); // first append the new message with the information
@@ -880,7 +905,7 @@ function sendMessage(message) {
         chatborder.appendChild(newMessage)
     }
     else { chatborder.insertChildAtIndex(newMessage, 1) }
-    chatbox.value = "";
+    
     //console.log(chatborder.childElementCount)
 }
 

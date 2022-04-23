@@ -4,6 +4,13 @@ const express = require('express')
 const socketio = require('socket.io')
 const formatMessage = require('./utils/messages')
 const { userJoin, getCurrentUser, userLeave, getRoomUsers} = require('./utils/users')
+const connectLivereload = require("connect-livereload");
+const livereload = require("livereload");
+
+const liveReloadServer = livereload.createServer();
+liveReloadServer.watch(path.join(__dirname, 'public'));
+
+
 
 
 const app = express()
@@ -13,6 +20,7 @@ const io = socketio(server)
 //sets static folders
 app.use(express.static(path.join(__dirname, 'public')))
 app.use("/scripts", express.static(__dirname + '/node_modules/fullcalendar/'))
+app.use(connectLivereload());
 
 const botName = 'EduBot'
 
@@ -45,13 +53,14 @@ io.on('connection', socket => {
     })
     socket.on('leaveRoom', () => {
         const user = userLeave(socket.id)
-        // sends message to all saying user disconnected
-        let currRoom = user.room
-
-        socket.leave(user.room)
-        user.room = ""
+    
     
         if (user) {
+        // sends message to all saying user disconnected
+            let currRoom = user.room
+
+            socket.leave(user.room)
+            user.room = ""
             io.to(currRoom).emit('message', formatMessage(botName, `${user.name} has left the chat`))
             io.to(currRoom).emit('roomUsers', {
                 room: currRoom,

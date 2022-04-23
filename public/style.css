@@ -1,3 +1,7 @@
+* {
+  font-family: Roboto;
+}
+
 /* The side panel for the server and home buttons*/
 .classes { 
     height: 100%;
@@ -23,6 +27,31 @@
     font-size: 16px;
     cursor: pointer;
   }
+p {
+  margin: 0 0 0 0;
+}
+.chat-message {
+  border: 1px solid;
+  
+  border-color: rgb(37, 214, 226);
+  
+  background-color: rgb(117, 241, 250);
+  border-radius: 5px;
+}
+#message-text {
+  font-size: 16px;
+  margin-left: 10px;
+}
+#username {
+  font-size: 20px;
+  margin-right: 12px;
+  margin-left: 10px;
+}
+
+#userinfo {
+  display: flex;
+  align-items: baseline;
+}
 
   /*Side panel for the chatroom */
   .rooms {
