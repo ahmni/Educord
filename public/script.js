@@ -1077,6 +1077,7 @@ function testSuite() {
 
     console.log("Test #1: adding a server " + addServer());
     console.log("Test #2: deleting a server " + deleteServer());
+    calendarTests();
 }
 
   //An object that get the events of a calendar
@@ -1317,16 +1318,6 @@ function testSuite() {
           //Return false
           return false;
       }
-      
-      //Otherwise, if the length of startDate is not 10
-      else if(startDate.length != 10)
-      {
-          //Alert the user that the input is invalid
-          alert("Start Date is invalid");
-
-          //Return false
-          return false;
-      }
       //Otherwise, if start date is not a valid
       else if(checkDate(startDate) == false)
       {
@@ -1354,18 +1345,7 @@ function testSuite() {
       //Otherwise, if not
       else
       {
-        //Next, check the length of endDate
-        //If endDate's length is not 10
-        if(endDate.length != 10)
-        {
-            //Alert the user that endDate is not valid
-            alert("End Date is not valid");
-
-            //Return false
-            return false;
-        }
-        //Otherwise, if endDate is not a valid date
-        else if(checkDate(endDate) == false)
+        if(checkDate(endDate) == false)
         {
             //Alert the user that endDate is not valid
             alert("End Date is not valid");
@@ -1383,6 +1363,12 @@ function testSuite() {
                 //Return false
                 return false;
             }
+            //Otherwise, return true
+            else
+            {
+                //Return true
+                return true;
+            }
         }
         //Otherwise, endDate is valid
         else
@@ -1396,7 +1382,15 @@ function testSuite() {
   //Checks if a date is valid
   function checkDate(date)
   {
-    //Firstly, check if - exists in date
+    //Firstly, check if the date is the correct length
+    //If the date is not the correct length
+    if(date.length != 10)
+    {
+        //Return false
+        return false;
+    }
+
+    //Next, check if - exists in date
     let firstDash = date.charAt(4);
     let secondDash = date.charAt(7);
 
@@ -1623,8 +1617,13 @@ function addOptions(events)
         //If the end date exists
         if(event.end != null)
         {
+            //Modified end date
+            let end = new Date(event.end);
+            end.setDate(end.getDate() - 1);
+            end = end.toISOString().slice(0,10);
+
             //Add the end date to the option innerHTML
-            option.innerHTML = option.innerHTML + " | End: " + event.end;
+            option.innerHTML = option.innerHTML + " | End: " + end;
         }
 
         //Finally, add the color to the innerhtml
@@ -1678,4 +1677,372 @@ function checkColorFormat(color)
     
     //If color is in the correct format, return true
     return true;
+}
+
+//Tests all functionallity within the calendar
+function calendarTests()
+{
+    //Turn off alerts
+    let alert = window.alert;
+    window.alert = function () {};
+
+    //Tests a titile check for an empty input
+    function calTest01()
+    {
+        //Passes in a empty input into checkTitle
+        //If checkTititle returns false
+        if(checkTitle("") == false)
+        {
+            //Return Passed
+            return "PASSED";
+        }
+        //Otherwise, return FAILED
+        else
+        {
+            return "FAILED";
+        }
+    }
+
+    //Tests a title check for an non empty input
+    function calTest02()
+    {
+        //Passes in a non empty input into checkTitle
+        //If checkTititle returns true
+        if(checkTitle("Hello") == true)
+        {
+            //Return Passed
+            return "PASSED";
+        }
+        //Otherwise, return FAILED
+        else
+        {
+            return "FAILED";
+        }
+    }
+
+    //Test a date check if a valid starting date
+    function calTest03()
+    {
+        //Pass in a valid starting date
+        //PASSED if return true and FAILED if not
+        if(checkStartDate("2022-03-04"))
+        {
+            return "PASSED";
+        }
+        else
+        {
+            return "FAILED";
+        }
+    }
+
+    //Test a date check if an empty starting date
+    function calTest04()
+    {
+        //Pass if the starting date is reject and fail if not
+        if(checkStartDate("") == false)
+        {
+            return "PASSED";
+        }
+        else
+        {
+            return "FAILED";
+        }
+    }
+
+    //Test a date check if an empty end date
+    function calTest05()
+    {
+        //Pass if end date is accepted and failed if not
+        if(checkEndDate("", "") == true) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test a date check with a valid end date
+    function calTest06()
+    {
+        //Pass if end date is accepted and failed if not
+        if(checkEndDate("2022-06-06", "2022-06-07") == true) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test, a date check if date with the wrong length
+    function calTest07()
+    {
+        //Pass if date is reject and failed if not
+        if(checkDate("1212") == false) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test a date check that does not have -
+    function calTest08()
+    {
+        //Pass if date is reject and failed if not
+        if(checkDate("2022/03/04") == false) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test a date check if it has a . after year, month, or day
+    function calTest09()
+    {
+         //Pass if date is reject and failed if not
+         if(checkDate("202.-3.-4.") == false) return "PASSED";
+         else return "FAILED";
+    }
+
+    //Test a date check if year, month, or day are not intergers
+    function calTest10()
+    {
+         //Pass if date is reject and failed if not
+         if(checkDate("20.2-.4-.4") == false) return "PASSED";
+         else return "FAILED";
+    }
+
+    //Test a date if the date is not a valid date
+    function calTest11()
+    {
+        //Pass if date is reject and failed if not
+        if(checkDate("2022-04-32") == false) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test, if two dates that are consecutive are consecutive
+    function calTest12()
+    {
+        //Pass if both dates are consecutive, failed if not
+        if(consecutiveDates("2022-04-04", "2022-04-05")) return "PASSED";
+        else return "FAILED";
+
+    }
+
+    //Test, if two dates are not consecutive
+    function calTest13()
+    {
+        //Pass if both dates are not consecutive
+        if(consecutiveDates("2022-04-05", "2022-04-04") == false) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test if a color that is vailid is valid
+    function calTest14()
+    {
+        //Pass if the color checker turns ture, fail if not
+        if (checkColor("red")) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test if a color that does not exist is valid
+    function calTest15()
+    {
+        //Pass if the color is reject, fail if not
+        if (checkColor("adfa") == false) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test if a color that is not in the correct format is valid
+    function calTest16()
+    {
+        //Pass if the color is rejected, fail if not
+        if(checkColor("RED") == false) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test if the calendar does add a event with no end date
+    function calTest17()
+    {
+        //Get the lengths of bot fullCalendar and calendar's events
+        let fullLength = home.cal.fullCalendar.getEvents().length;
+        let calLength = cal.events.length;
+
+        //Set the values of all inputs for create event 
+        window.document.querySelector("#createTitle").value = "Hello";
+        window.document.querySelector("#createStartDate").value = "2022-04-25";
+        window.document.querySelector("#createEndDate").value = "";
+        window.document.querySelector("#createColor").value = "green";
+
+        //Call addEvent
+        addEvent();
+
+        //Next, check the the length of full calendar and calender
+        fullLength = home.cal.fullCalendar.getEvents().length - fullLength;
+        calLength = cal.events.length - calLength;
+
+        //If both fullLength and calLength are 1, return PASSED
+        //Otherwise, return FAILED
+        if(fullLength == 1 && calLength == 1) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test if the calendar does add a event with an end date
+    function calTest18()
+    {
+        //Get the lengths of bot fullCalendar and calendar's events
+        let fullLength = home.cal.fullCalendar.getEvents().length;
+        let calLength = cal.events.length;
+
+        //Set the values of all inputs for create event 
+        window.document.querySelector("#createTitle").value = "Hello";
+        window.document.querySelector("#createStartDate").value = "2022-04-25";
+        window.document.querySelector("#createEndDate").value = "2022-04-26";
+        window.document.querySelector("#createColor").value = "green";
+
+        //Call addEvent
+        addEvent();
+
+        //Next, check the the length of full calendar and calender
+        fullLength = home.cal.fullCalendar.getEvents().length - fullLength;
+        calLength = cal.events.length - calLength;
+
+        //If both fullLength and calLength are 1, return PASSED
+        //Otherwise, return FAILED
+        if(fullLength == 1 && calLength == 1) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test if serach the calendar with no inputs gives us a non filtered list of events
+    function calTest19()
+    {
+        //Get the length of calendar's events
+        let calLength = cal.events.length;
+
+        //Next, set all the values of delete event to be empty
+        window.document.querySelector("#deleteTitle").value = "";
+        window.document.querySelector("#deleteStartDate").value = "";
+        window.document.querySelector("#deleteEndDate").value = "";
+        window.document.querySelector("#deleteColor").value = "";
+
+        //Next, search all events
+        searchEvent();
+
+        //Next, get the number of options from delete
+        let numOptions = window.document.querySelector("#deleteSelect").children.length;
+
+        //If numOptions is the same as calLength, then return true
+        //Otherwiese, return false
+        if (calLength == numOptions) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test if search looks for a specifc event 
+    function calTest20()
+    {
+        //Next, set all the values of delete event to be empty
+        window.document.querySelector("#deleteTitle").value = "Hello";
+        window.document.querySelector("#deleteStartDate").value = "2022-04-25";
+        window.document.querySelector("#deleteEndDate").value = "2022-04-26";
+        window.document.querySelector("#deleteColor").value = "green";
+
+        //Next, search all events
+        searchEvent();
+
+        //Next, get the number of options from delete
+        let numOptions = window.document.querySelector("#deleteSelect").children.length;
+
+        //If numOptions is the same as calLength, then return true
+        //Otherwiese, return false
+        if (numOptions == 1) return "PASSED";
+        else return "FAILED";
+    }
+
+    //Test deleting an event from a calendar with an end date
+    function calTest21()
+    {
+        //Get the lengths of bot fullCalendar and calendar's events
+        let fullLength = home.cal.fullCalendar.getEvents().length;
+        let calLength = cal.events.length;
+
+        //Next, set all the values of delete event to be empty
+        window.document.querySelector("#deleteTitle").value = "Hello";
+        window.document.querySelector("#deleteStartDate").value = "2022-04-25";
+        window.document.querySelector("#deleteEndDate").value = "2022-04-26";
+        window.document.querySelector("#deleteColor").value = "green";
+
+        //Next, search all events
+        searchEvent();
+
+        //Next, delete the event
+        deleteEvent();
+
+        //Next, get the length of fullClaendar and calendar's events
+         //Next, check the the length of full calendar and calender
+         fullLength = home.cal.fullCalendar.getEvents().length - fullLength;
+         calLength = cal.events.length - calLength;
+
+         //If fullLength and calLength are -1 then return passed, otherwise return failed
+         if(fullLength == -1 && calLength == -1) return "PASSED";
+         else return "FAILED";
+    }
+
+    //Test deleting an event with no end date
+    //Test deleting an event from a calendar with an end date
+    function calTest22()
+    {
+        //Get the lengths of bot fullCalendar and calendar's events
+        let fullLength = home.cal.fullCalendar.getEvents().length;
+        let calLength = cal.events.length;
+
+        //Next, set all the values of delete event to be empty
+        window.document.querySelector("#deleteTitle").value = "Hello";
+        window.document.querySelector("#deleteStartDate").value = "2022-04-25";
+        window.document.querySelector("#deleteEndDate").value = "";
+        window.document.querySelector("#deleteColor").value = "green";
+
+        //Next, search all events
+        searchEvent();
+
+        //Next, delete the event
+        deleteEvent();
+
+        //Next, get the length of fullClaendar and calendar's events
+         //Next, check the the length of full calendar and calender
+         fullLength = home.cal.fullCalendar.getEvents().length - fullLength;
+         calLength = cal.events.length - calLength;
+
+         //If fullLength and calLength are -1 then return passed, otherwise return failed
+         if(fullLength == -1 && calLength == -1) return "PASSED";
+         else return "FAILED";
+    }
+
+    //Test getting a list from local storage. It also checks storing a list
+    function calTest23()
+    {
+        //Get the current calendar's events
+        let current = cal.events;
+
+        //Next, load the events from local storage
+        cal.loadEvents();
+
+        //If current and cal.events are the same, return PASSED
+        //Otherwise, return FAILED
+        if(current.length == cal.events.length) return "PASSED";
+        else return "FAILED";
+    }
+
+
+    console.log("Calendar Test #1: Check empty title " + calTest01());
+    console.log("Calendar Test #2: Check non empty title " + calTest02());
+    console.log("Calendar Test #3: Check valid start date " + calTest03());
+    console.log("Calendar Test #4: Check empty start date " + calTest04());
+    console.log("Calendar Test #5: Check empty end date " + calTest05());
+    console.log("Calendar Test #6: Check valid end date " + calTest06());
+    console.log("Calendar Test #7: Check date with wrong length " + calTest07());
+    console.log("Calendar Test #8: Check date with no - " + calTest08());
+    console.log("Calendar Test #9: Check date with . " + calTest09());
+    console.log("Calendar Test #10: Check date with decimals " + calTest10());
+    console.log("Calendar Test #11: Check date that does not exist " + calTest11());
+    console.log("Calendar Test #12: Check two dates that are consecutive " + calTest12());
+    console.log("Calendar Test #13: Check two dates that are not consecutive " + calTest13());
+    console.log("Calendar Test #14: Check a valid color " + calTest14());
+    console.log("Calendar Test #15: Check a color that does not exist " + calTest15());
+    console.log("Calendar Test #16: Check a color in the wrong format " + calTest16());
+    console.log("Calendar Test #17: Test adding an event with no end date to the calendar " + calTest17());
+    console.log("Calendar Test #18: Test adding an event with an end date to the calendar " + calTest18());
+    console.log("Calendar Test #19: Search for all events from calendar " + calTest19());
+    console.log("Calendar Test #20: Search for a specific event from calendar " + calTest20());
+    console.log("Calendar Test #21: Delete an event from the calendar with an end date " + calTest21());
+    console.log("Calendar Test #22: Delete an event from the calendar with no end date " + calTest22());
+    console.log("Calendar Test #23: Store and Load a list of calendar events " + calTest23());
+
+    //Turn on alerts 
+    window.alert = alert;
+    
 }
