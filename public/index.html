@@ -10,6 +10,7 @@
 <script src='/scripts/main.js'></script>
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 
+
 <!DOCTYPE html>
 <title>Educord</title>
 <html>
@@ -42,6 +43,56 @@
                     </div>
                 </div>
             </div>
+
+            <div id="createEvent" class="modal" style="display: none;">
+                <div class="modal-content" style="width:20%;">
+                    <span class="close">&times;</span>
+                    <div style="text-align: center; padding-bottom: 10px;">Add Event</div>
+    
+                    <label for="title">Title:</label>
+                    <input type="text" id="createTitle" ></input>
+                    <br></br>
+                    <label for="startDate" >Start Date:</label>
+                    <input type="text" placeholder="YYYY-MM-DD" id="createStartDate"></input>
+                    <br></br>
+                    <label for="endDate" >End Date:</label>
+                    <input type="text" placeholder="YYYY-MM-DD" id="createEndDate"></input>
+                    <br></br>
+                    <label for="Color">Color:</label>
+                    <input type="text" id="createColor" ></input>
+                    <br></br>
+                    <button onclick="addEvent()">Add Event</button>
+                </div>
+            </div>
+
+            <div id="deleteEvent" class="modal" style="display: none;">
+                <div class="modal-content" style="width:50%;">
+                    <span class="close">&times;</span>
+                    <div style="text-align: center; padding-bottom: 10px;">Delete Event</div>
+    
+                    <label for="deleteTitle">Title:</label>
+                    <input type="text" id="deleteTitle" ></input>
+                    <br></br>
+                    <label for="deleteStartDate" >Start Date:</label>
+                    <input type="text" placeholder="YYYY-MM-DD" id="deleteStartDate"></input>
+                    <br></br>
+                    <label for="deleteEndDate" >End Date:</label>
+                    <input type="text" placeholder="YYYY-MM-DD" id="deleteEndDate"></input>
+                    <br></br>
+                    <label for="deleteColor">Color:</label>
+                    <input type="text" id="deleteColor" ></input>
+                    <br></br>
+                    <button onclick="searchEvent()">Search Event</button>
+
+                    <div id="delete" style="display: none; margin-top:10px;">
+                        <select id="deleteSelect" style="margin-top:10px;">
+
+                        </select><br></br>
+                        <button onclick="deleteEvent()">Delete Event</button>
+                    </div>
+                </div>
+            </div>
+
         </div> 
     </body>
 </html> 
