@@ -459,6 +459,8 @@ class User {
         this.status = 3
         this.permissions = permissions
         this.profilePicture = profilePicture
+        this.server = ""
+        this.channel = ""
         this.room = ""
     }
 
@@ -501,7 +503,15 @@ class User {
     }
 
     setCurrentRoom(room) {
-        this.room = room
+        this.room = this.server + this.channel
+    }
+
+    setCurrentChannel(channel) {
+        this.channel = channel
+    }
+
+    setCurrentServer(server) {
+        this.server = server
     }
 }
 
@@ -528,6 +538,7 @@ class Server {
             leaveHome();
             let messages = document.getElementById('chatborder');
             if (currentUser.room != "") {
+                console.log(currentUser.room)
                 socket.emit('leaveRoom', {})
             }
 
@@ -535,16 +546,11 @@ class Server {
                 chatborder.removeChild(chatborder.lastChild)
             }
 
+            document.getElementById('chatroomHeader').innerHTML = this.name;
 
+            
+            currentUser.setCurrentServer(this.name)
 
-            currentUser.setCurrentRoom(this.name)
-
-            socket.emit('joinRoom', currentUser)
-            // add userlist functionality?
-            socket.on('roomUsers', (currentUser) => {
-                // outputRoomName(currentUser.room)
-                // outputUsers(currentUser.users)
-            })
 
         });
         button.className = "serverButton";
@@ -574,7 +580,25 @@ class Server {
             let button = document.createElement("button");
             let temp = document.createTextNode(channel.name);
             button.appendChild(temp);
-            button.addEventListener("click", () => this.colorChange(channel));
+            button.addEventListener("click", () => {
+                this.colorChange(channel)
+                if (currentUser.room != "") {
+                    socket.emit('leaveRoom', {})
+                }
+                while (chatborder.childNodes.length > 2) {
+                    chatborder.removeChild(chatborder.lastChild)
+                }
+                currentUser.setCurrentChannel(channel.name)
+                currentUser.setCurrentRoom(channel.name)
+                
+                console.log()
+                socket.emit('joinRoom', currentUser)
+                // add userlist functionality?
+                socket.on('roomUsers', (currentUser) => {
+                    // outputRoomName(currentUser.room)
+                    // outputUsers(currentUser.users)
+                })
+            });
             button.setAttribute("Id", channel.name)
             button.className = "roomButton";
             button.id = channel.name + "channel";
@@ -823,19 +847,29 @@ let sendBox = document.getElementById('chatbox')
 
 sendBox.addEventListener("keypress", function (event) { //calls send message when user presses the enter button
     if (event.key === 'Enter') {
-        const msg = sendBox.value
-
-        socket.emit('chatMessage', msg)
+        if (currentUser.channel != "") {
+            const msg = sendBox.value;
+            socket.emit('chatMessage', msg)
+            chatbox.value = "";
+        } else {
+            alert("Error: please join a room")
+        }
     };
 })
 
 sendButton.addEventListener('click', (e) => {
     let chatbox = document.getElementById("chatbox")
-    const msg = chatbox.value
-    console.log(msg)
+    if (currentUser.channel != "") {
+        const msg = chatbox.value
+   
 
-    socket.emit('chatMessage', msg)
-    chatbox.focus()
+        socket.emit('chatMessage', msg)
+        chatbox.focus()
+        chatbox.value = "";
+    }else {
+        alert("Error: please join a room")
+    }
+   
 })
 
 socket.on('message', message => {
@@ -862,9 +896,20 @@ function sendMessage(message) {
     let newMessage = document.createElement("div"); // the message to add to chatborder
     let userInfo = document.createElement("div"); // the time and user information of the message
     let messageText = document.createElement("div"); // the actual text of the message
+    userInfo.id = "userinfo"
+    messageText.id ="message-text"
+    
 
+    let name = document.createElement("p")
+    let date = document.createElement("p")
+    name.id = "username"
     newMessage.setAttribute('class', 'chat-message')
-    userInfo.textContent = `[${message.time}] ${message.username}:`;
+    name.textContent = `   ${message.username}`;
+    date.textContent = `${message.time}`
+    userInfo.appendChild(name)
+    userInfo.appendChild(date)
+    
+
     messageText.textContent = message.text;
 
     newMessage.appendChild(userInfo); // first append the new message with the information
@@ -877,7 +922,7 @@ function sendMessage(message) {
         chatborder.appendChild(newMessage)
     }
     else { chatborder.insertChildAtIndex(newMessage, 1) }
-    chatbox.value = "";
+    
     //console.log(chatborder.childElementCount)
 }
 

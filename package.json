@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "connect-livereload": "^0.6.1",
     "express": "^4.17.3",
     "fullcalendar": "^5.10.2",
+    "livereload": "^0.9.3",
     "moment": "^2.29.2",
     "socket.io": "^4.4.1"
   },
@@ -27,4 +29,3 @@
     "nodemon": "^2.0.15"
   }
 }
-
