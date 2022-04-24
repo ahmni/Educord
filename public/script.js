@@ -1698,167 +1698,7 @@ function calendarTests()
     let alert = window.alert;
     window.alert = function () {};
 
-    //Tests a titile check for an empty input
-    function calTest01()
-    {
-        //Passes in a empty input into checkTitle
-        //If checkTititle returns false
-        if(checkTitle("") == false)
-        {
-            //Return Passed
-            return "PASSED";
-        }
-        //Otherwise, return FAILED
-        else
-        {
-            return "FAILED";
-        }
-    }
-
-    //Tests a title check for an non empty input
-    function calTest02()
-    {
-        //Passes in a non empty input into checkTitle
-        //If checkTititle returns true
-        if(checkTitle("Hello") == true)
-        {
-            //Return Passed
-            return "PASSED";
-        }
-        //Otherwise, return FAILED
-        else
-        {
-            return "FAILED";
-        }
-    }
-
-    //Test a date check if a valid starting date
-    function calTest03()
-    {
-        //Pass in a valid starting date
-        //PASSED if return true and FAILED if not
-        if(checkStartDate("2022-03-04"))
-        {
-            return "PASSED";
-        }
-        else
-        {
-            return "FAILED";
-        }
-    }
-
-    //Test a date check if an empty starting date
-    function calTest04()
-    {
-        //Pass if the starting date is reject and fail if not
-        if(checkStartDate("") == false)
-        {
-            return "PASSED";
-        }
-        else
-        {
-            return "FAILED";
-        }
-    }
-
-    //Test a date check if an empty end date
-    function calTest05()
-    {
-        //Pass if end date is accepted and failed if not
-        if(checkEndDate("", "") == true) return "PASSED";
-        else return "FAILED";
-    }
-
-    //Test a date check with a valid end date
-    function calTest06()
-    {
-        //Pass if end date is accepted and failed if not
-        if(checkEndDate("2022-06-06", "2022-06-07") == true) return "PASSED";
-        else return "FAILED";
-    }
-
-    //Test, a date check if date with the wrong length
-    function calTest07()
-    {
-        //Pass if date is reject and failed if not
-        if(checkDate("1212") == false) return "PASSED";
-        else return "FAILED";
-    }
-
-    //Test a date check that does not have -
-    function calTest08()
-    {
-        //Pass if date is reject and failed if not
-        if(checkDate("2022/03/04") == false) return "PASSED";
-        else return "FAILED";
-    }
-
-    //Test a date check if it has a . after year, month, or day
-    function calTest09()
-    {
-         //Pass if date is reject and failed if not
-         if(checkDate("202.-3.-4.") == false) return "PASSED";
-         else return "FAILED";
-    }
-
-    //Test a date check if year, month, or day are not intergers
-    function calTest10()
-    {
-         //Pass if date is reject and failed if not
-         if(checkDate("20.2-.4-.4") == false) return "PASSED";
-         else return "FAILED";
-    }
-
-    //Test a date if the date is not a valid date
-    function calTest11()
-    {
-        //Pass if date is reject and failed if not
-        if(checkDate("2022-04-32") == false) return "PASSED";
-        else return "FAILED";
-    }
-
-    //Test, if two dates that are consecutive are consecutive
-    function calTest12()
-    {
-        //Pass if both dates are consecutive, failed if not
-        if(consecutiveDates("2022-04-04", "2022-04-05")) return "PASSED";
-        else return "FAILED";
-
-    }
-
-    //Test, if two dates are not consecutive
-    function calTest13()
-    {
-        //Pass if both dates are not consecutive
-        if(consecutiveDates("2022-04-05", "2022-04-04") == false) return "PASSED";
-        else return "FAILED";
-    }
-
-    //Test if a color that is vailid is valid
-    function calTest14()
-    {
-        //Pass if the color checker turns ture, fail if not
-        if (checkColor("red")) return "PASSED";
-        else return "FAILED";
-    }
-
-    //Test if a color that does not exist is valid
-    function calTest15()
-    {
-        //Pass if the color is reject, fail if not
-        if (checkColor("adfa") == false) return "PASSED";
-        else return "FAILED";
-    }
-
-    //Test if a color that is not in the correct format is valid
-    function calTest16()
-    {
-        //Pass if the color is rejected, fail if not
-        if(checkColor("RED") == false) return "PASSED";
-        else return "FAILED";
-    }
-
-    //Test if the calendar does add a event with no end date
+     //Test if the calendar does add a event with no end date
     function calTest17()
     {
         //Get the lengths of bot fullCalendar and calendar's events
@@ -2029,30 +1869,14 @@ function calendarTests()
         else return "FAILED";
     }
 
-
-    console.log("Calendar Test #1: Check empty title " + calTest01());
-    console.log("Calendar Test #2: Check non empty title " + calTest02());
-    console.log("Calendar Test #3: Check valid start date " + calTest03());
-    console.log("Calendar Test #4: Check empty start date " + calTest04());
-    console.log("Calendar Test #5: Check empty end date " + calTest05());
-    console.log("Calendar Test #6: Check valid end date " + calTest06());
-    console.log("Calendar Test #7: Check date with wrong length " + calTest07());
-    console.log("Calendar Test #8: Check date with no - " + calTest08());
-    console.log("Calendar Test #9: Check date with . " + calTest09());
-    console.log("Calendar Test #10: Check date with decimals " + calTest10());
-    console.log("Calendar Test #11: Check date that does not exist " + calTest11());
-    console.log("Calendar Test #12: Check two dates that are consecutive " + calTest12());
-    console.log("Calendar Test #13: Check two dates that are not consecutive " + calTest13());
-    console.log("Calendar Test #14: Check a valid color " + calTest14());
-    console.log("Calendar Test #15: Check a color that does not exist " + calTest15());
-    console.log("Calendar Test #16: Check a color in the wrong format " + calTest16());
-    console.log("Calendar Test #17: Test adding an event with no end date to the calendar " + calTest17());
-    console.log("Calendar Test #18: Test adding an event with an end date to the calendar " + calTest18());
-    console.log("Calendar Test #19: Search for all events from calendar " + calTest19());
-    console.log("Calendar Test #20: Search for a specific event from calendar " + calTest20());
-    console.log("Calendar Test #21: Delete an event from the calendar with an end date " + calTest21());
-    console.log("Calendar Test #22: Delete an event from the calendar with no end date " + calTest22());
-    console.log("Calendar Test #23: Store and Load a list of calendar events " + calTest23());
+    //Console log all tests with calendar
+    console.log("Test #3: Test adding an event with no end date to the calendar " + calTest17());
+    console.log("Test #4: Test adding an event with an end date to the calendar " + calTest18());
+    console.log("Test #5: Search for all events from calendar " + calTest19());
+    console.log("Test #6: Search for a specific event from calendar " + calTest20());
+    console.log("Test #7: Delete an event from the calendar with an end date " + calTest21());
+    console.log("Test #8: Delete an event from the calendar with no end date " + calTest22());
+    console.log("Test #9: Store and Load a list of calendar events " + calTest23());
 
     //Turn on alerts 
     window.alert = alert;
