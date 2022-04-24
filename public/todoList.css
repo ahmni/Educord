@@ -190,3 +190,7 @@ li {
 .edit:hover {
     filter: invert(63%) sepia(2%) saturate(2%) hue-rotate(324deg) brightness(98%) contrast(80%);
 }
+
+.edit {
+    margin-left: 20px;
+}

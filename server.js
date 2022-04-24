@@ -6,6 +6,7 @@ const formatMessage = require('./utils/messages')
 const { userJoin, getCurrentUser, userLeave, getRoomUsers} = require('./utils/users')
 const connectLivereload = require("connect-livereload");
 const livereload = require("livereload");
+const cors = require('cors');
 
 const liveReloadServer = livereload.createServer();
 liveReloadServer.watch(path.join(__dirname, 'public'));
@@ -21,6 +22,14 @@ const io = socketio(server)
 app.use(express.static(path.join(__dirname, 'public')))
 app.use("/scripts", express.static(__dirname + '/node_modules/fullcalendar/'))
 app.use(connectLivereload());
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
+    
 
 const botName = 'EduBot'
 

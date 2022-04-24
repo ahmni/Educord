@@ -113,7 +113,8 @@ function addTodos(text, project, completed, index) {
     newTodo.classList.add("todo-item");
     todoDiv.appendChild(newTodo);
 
-    const editTodo = document.createElement("box-icon");
+    const editTodo = document.createElement("div");
+    editTodo.innerHTML = "[edit]"
     editTodo.setAttribute("name", "edit");
     editTodo.setAttribute("type", "solid");
     editTodo.classList.add("edit");
@@ -357,6 +358,8 @@ close1.addEventListener('click', e => {
 function closeForm(container) {
     container.style.display = 'none';
 }
+
+
 
 
 function storageAvailable(type) {
