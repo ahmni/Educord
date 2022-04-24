@@ -804,8 +804,9 @@ class ChatMessage {
     }
 
 }
+let id = Math.floor(Math.random() * 10000000)
 
-let currentUser = new User("Guest", "example@gmail.com", "", "");
+let currentUser = new User("Guest" + id, "example@gmail.com", "", "");
 
 function setUser() {
 
