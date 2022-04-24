@@ -163,7 +163,10 @@ class calendarInterface
 
                 //Set eventDeleted to be true
                 eventDeleted = true;
+               
+                return;
             }
+          
 
             //If eventDelted is true, break the loop
             if(eventDeleted == true) break;
@@ -1171,13 +1174,21 @@ function testSuite() {
       //Removes an event from the list
       removeEvent(event)
       {
+          let count = 0;
+          let isEvent = false;
           //Goes through each events from event and filter
           this.events = this.events.filter(x => {
+              isEvent = false;
               let sameTitle = x.title == event.title;
               let sameStart = x.start == event.start;
               let sameEnd = x.end == event.end;
               let sameColor = x.color == event.color;
-              return !(sameTitle && sameStart && sameEnd && sameColor);
+              if (sameTitle && sameStart && sameEnd && sameColor && (count == 0)) {
+                  isEvent = true;
+                  count++;
+              }
+              
+              return !(sameTitle && sameStart && sameEnd && sameColor && isEvent);
           });
 
           //Load the events to local storage
